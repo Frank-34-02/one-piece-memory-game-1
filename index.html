@@ -2,46 +2,46 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>海贼王消除游戏</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>海贼王记忆游戏</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             margin: 0;
+            padding: 0;
             background-color: #f0f0f0;
+            touch-action: manipulation;
         }
         #game-container {
             width: 100%;
-            max-width: 1200px;
-            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 10px;
+            box-sizing: border-box;
         }
         #level-info {
             text-align: center;
             font-size: 24px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         #game-board {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 10px;
+            gap: 5px;
             justify-content: center;
         }
         .card {
             aspect-ratio: 1;
             background-size: cover;
             background-position: center;
-            border-radius: 10px;
+            border-radius: 5px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            cursor: pointer;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transform: translateZ(0);
+            touch-action: manipulation;
         }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        .card:active {
+            transform: scale(0.95) translateZ(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
     </style>
 </head>
@@ -53,17 +53,29 @@
     <script>
         const characters = [
             'luffy', 'zoro', 'nami', 'usopp', 'sanji', 'chopper', 'robin', 'franky', 'brook',
-            'ace', 'sabo', 'law', 'hancock', 'jinbe', 'buggy', 'shanks', 'whitebeard', 'kaido', 'bigmom',
-            'blackbeard', 'aokiji', 'kizaru', 'akainu', 'garp', 'sengoku', 'doflamingo', 'crocodile', 'mihawk', 'kuma',
-            'moria', 'enel', 'magellan', 'ivankov', 'dragon', 'rayleigh', 'roger', 'oden', 'yamato', 'marco',
-            'katakuri', 'cracker', 'smoothie', 'perospero', 'jack', 'queen', 'king', 'vista', 'jozu', 'thatch'
+            'ace', 'sabo', 'law', 'hancock', 'jinbe', 'buggy', 'shanks', 'whitebeard', 'kaido', 'bigmom'
         ];
 
         const characterImages = {
-            'luffy': 'https://onepiece.fandom.com/wiki/Special:Filepath/Luffy_Portrait.png',
-            'zoro': 'https://onepiece.fandom.com/wiki/Special:Filepath/Zoro_Portrait.png',
-            'nami': 'https://onepiece.fandom.com/wiki/Special:Filepath/Nami_Portrait.png',
-            // ... 添加更多角色的图片链接 ...
+            'luffy': 'https://i.imgur.com/QvCNtdR.png',
+            'zoro': 'https://i.imgur.com/WQpTodK.png',
+            'nami': 'https://i.imgur.com/Zx7sQDw.png',
+            'usopp': 'https://i.imgur.com/JMRPxoT.png',
+            'sanji': 'https://i.imgur.com/Qe6eGQO.png',
+            'chopper': 'https://i.imgur.com/Ux2hhXY.png',
+            'robin': 'https://i.imgur.com/Gg8VqZI.png',
+            'franky': 'https://i.imgur.com/Gg8VqZI.png',
+            'brook': 'https://i.imgur.com/Gg8VqZI.png',
+            'ace': 'https://i.imgur.com/Gg8VqZI.png',
+            'sabo': 'https://i.imgur.com/Gg8VqZI.png',
+            'law': 'https://i.imgur.com/Gg8VqZI.png',
+            'hancock': 'https://i.imgur.com/Gg8VqZI.png',
+            'jinbe': 'https://i.imgur.com/Gg8VqZI.png',
+            'buggy': 'https://i.imgur.com/Gg8VqZI.png',
+            'shanks': 'https://i.imgur.com/Gg8VqZI.png',
+            'whitebeard': 'https://i.imgur.com/Gg8VqZI.png',
+            'kaido': 'https://i.imgur.com/Gg8VqZI.png',
+            'bigmom': 'https://i.imgur.com/Gg8VqZI.png'
         };
 
         let currentLevel = 1;
@@ -81,17 +93,18 @@
             const gameBoard = document.getElementById('game-board');
             gameBoard.innerHTML = '';
 
-            const pairsCount = level === 1 ? 10 : level === 2 ? 50 : 100;
+            const pairsCount = level === 1 ? 10 : level === 2 ? 15 : 19;
             const cards = [...characters.slice(0, pairsCount), ...characters.slice(0, pairsCount)];
             shuffleArray(cards);
 
-            gameBoard.style.gridTemplateColumns = `repeat(auto-fill, minmax(${level === 1 ? '100px' : level === 2 ? '80px' : '60px'}, 1fr))`;
+            const columns = level === 1 ? 4 : level === 2 ? 5 : 6;
+            gameBoard.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
 
             cards.forEach((character, index) => {
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.dataset.character = character;
-                card.style.backgroundImage = `url('${characterImages[character] || 'https://via.placeholder.com/100?text=' + character}')`;
+                card.style.backgroundImage = `url('${characterImages[character]}')`;
                 card.addEventListener('click', () => selectCard(card));
                 gameBoard.appendChild(card);
             });
@@ -117,7 +130,7 @@
                 card2.style.visibility = 'hidden';
                 matchedPairs++;
 
-                if (matchedPairs === (currentLevel === 1 ? 10 : currentLevel === 2 ? 50 : 100)) {
+                if (matchedPairs === (currentLevel === 1 ? 10 : currentLevel === 2 ? 15 : 19)) {
                     if (currentLevel < 3) {
                         currentLevel++;
                         document.getElementById('current-level').textContent = currentLevel;
