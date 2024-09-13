@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海贼王消除游戏</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #game-container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+        }
+        #level-info {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            justify-content: center;
+        }
+        .card {
+            aspect-ratio: 1;
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="level-info">第 <span id="current-level">1</span> 关</div>
+        <div id="game-board"></div>
+    </div>
+    <script>
+        const characters = [
+            'luffy', 'zoro', 'nami', 'usopp', 'sanji', 'chopper', 'robin', 'franky', 'brook',
+            'ace', 'sabo', 'law', 'hancock', 'jinbe', 'buggy', 'shanks', 'whitebeard', 'kaido', 'bigmom',
+            'blackbeard', 'aokiji', 'kizaru', 'akainu', 'garp', 'sengoku', 'doflamingo', 'crocodile', 'mihawk', 'kuma',
+            'moria', 'enel', 'magellan', 'ivankov', 'dragon', 'rayleigh', 'roger', 'oden', 'yamato', 'marco',
+            'katakuri', 'cracker', 'smoothie', 'perospero', 'jack', 'queen', 'king', 'vista', 'jozu', 'thatch'
+        ];
+
+        const characterImages = {
+            'luffy': 'https://onepiece.fandom.com/wiki/Special:Filepath/Luffy_Portrait.png',
+            'zoro': 'https://onepiece.fandom.com/wiki/Special:Filepath/Zoro_Portrait.png',
+            'nami': 'https://onepiece.fandom.com/wiki/Special:Filepath/Nami_Portrait.png',
+            // ... 添加更多角色的图片链接 ...
+        };
+
+        let currentLevel = 1;
+        let selectedCards = [];
+        let matchedPairs = 0;
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function createBoard(level) {
+            const gameBoard = document.getElementById('game-board');
+            gameBoard.innerHTML = '';
+
+            const pairsCount = level === 1 ? 10 : level === 2 ? 50 : 100;
+            const cards = [...characters.slice(0, pairsCount), ...characters.slice(0, pairsCount)];
+            shuffleArray(cards);
+
+            gameBoard.style.gridTemplateColumns = `repeat(auto-fill, minmax(${level === 1 ? '100px' : level === 2 ? '80px' : '60px'}, 1fr))`;
+
+            cards.forEach((character, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.character = character;
+                card.style.backgroundImage = `url('${characterImages[character] || 'https://via.placeholder.com/100?text=' + character}')`;
+                card.addEventListener('click', () => selectCard(card));
+                gameBoard.appendChild(card);
+            });
+        }
+
+        function selectCard(card) {
+            if (selectedCards.length < 2 && !selectedCards.includes(card) && !card.classList.contains('matched')) {
+                selectedCards.push(card);
+                card.style.opacity = '0.5';
+
+                if (selectedCards.length === 2) {
+                    setTimeout(checkMatch, 500);
+                }
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = selectedCards;
+            if (card1.dataset.character === card2.dataset.character) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                card1.style.visibility = 'hidden';
+                card2.style.visibility = 'hidden';
+                matchedPairs++;
+
+                if (matchedPairs === (currentLevel === 1 ? 10 : currentLevel === 2 ? 50 : 100)) {
+                    if (currentLevel < 3) {
+                        currentLevel++;
+                        document.getElementById('current-level').textContent = currentLevel;
+                        setTimeout(() => {
+                            alert(`恭喜！进入第 ${currentLevel} 关`);
+                            startLevel(currentLevel);
+                        }, 500);
+                    } else {
+                        alert('恭喜！你通关了！');
+                    }
+                }
+            } else {
+                card1.style.opacity = '1';
+                card2.style.opacity = '1';
+            }
+            selectedCards = [];
+        }
+
+        function startLevel(level) {
+            matchedPairs = 0;
+            createBoard(level);
+        }
+
+        startLevel(currentLevel);
+    </script>
+</body>
+</html>
